@@ -5,6 +5,16 @@ const copyButton = document.querySelector("#copy")
 const generate = document.querySelector("#generate")
 const body = document.querySelector("body")
 
+if (
+    !(textbg instanceof HTMLHeadingElement) ||
+    !(color1 instanceof HTMLButtonElement) ||
+    !(color2 instanceof HTMLButtonElement) ||
+    !(copyButton instanceof HTMLButtonElement) ||
+    !(generate instanceof HTMLButtonElement) ||
+    !(body instanceof HTMLBodyElement)
+)
+    throw new Error("Element not found or of different type")
+
 const setColor1 = (color) => {
     if (!color1) return
     color1.innerText = color
@@ -36,15 +46,15 @@ const updateBody = () => {
 }
 function setTextColor(hex) {
     // Remove the '#' if present
-    hex = hex.replace('#', '')
+    hex = hex.replace("#", "")
     // Convert hex to RGB
     const r = parseInt(hex.substr(0, 2), 16)
     const g = parseInt(hex.substr(2, 2), 16)
     const b = parseInt(hex.substr(4, 2), 16)
     // Calculate brightness
-    const brightness = (0.299 * r + 0.587 * g + 0.114 * b)
+    const brightness = 0.299 * r + 0.587 * g + 0.114 * b
     // Return dark text for light colors and light text for dark colors
-    return brightness > 128 ? '#000000' : '#FFFFFF'
+    return brightness > 128 ? "#000000" : "#FFFFFF"
 }
 
 const randomColorGenerator = () => {
@@ -62,16 +72,16 @@ const getUpdatedColor = () => {
 }
 
 const updateText = () => {
-    if (!textbg) return
     textbg.style.backgroundImage = getUpdatedColor()
     textbg.style.backgroundClip = "text"
     textbg.style.color = "transparent"
 }
 
 const setTextBrightness = () => {
-    if (!(copyButton && generate)) return
-
-    if (setTextColor(getColor1()) === "#FFFFFF" || setTextColor(getColor2()) === "#FFFFFF") {
+    if (
+        setTextColor(getColor1()) === "#FFFFFF" ||
+        setTextColor(getColor2()) === "#FFFFFF"
+    ) {
         copyButton.style.color = "#FFFFFF"
         generate.style.color = "#FFFFFF"
     } else {
@@ -81,29 +91,26 @@ const setTextBrightness = () => {
 }
 
 const generateNewCombo = (randomColor) => {
-    if (!(color1 && color2 && body && copyButton && generate)) return console.log("Element not found")
     setColor1(randomColor())
     setColor2(randomColor())
     updateBody()
-    setElemBackground(color1, getColor1())
-    setElemBackground(color2, getColor2())
+    setElemBackground(color1, getColor1() || "#000")
+    setElemBackground(color2, getColor2() || "#000")
     setElemBackground(copyButton, getUpdatedColor())
     setElemBackground(generate, getUpdatedColor())
     setTextBrightness()
     updateText()
 }
 
-copyButton?.addEventListener('click', () => {
+copyButton?.addEventListener("click", () => {
     navigator.clipboard.writeText(getUpdatedColor())
     copyButton.innerText = getUpdatedColor()
 })
 
-color1?.addEventListener('click', () => {
-    if (!copyButton || !generate) return
+color1?.addEventListener("click", () => {
     setColor1(randomColorGenerator())
     updateBody()
-    // color1.style.background = getColor1()
-    setElemBackground(color1, getColor1())
+    setElemBackground(color1, getColor1() || "#000")
     updateText()
     setElemBackground(copyButton, getUpdatedColor())
     setElemBackground(generate, getUpdatedColor())
@@ -111,28 +118,32 @@ color1?.addEventListener('click', () => {
     // color1.style.boxshadow=`0px 0px 30px 30px ${getColor1()}, 0px 0px 30px 30px ${getColor1()}`
 })
 
-color2?.addEventListener('click', () => {
-    if (!copyButton || !generate) return
+color2?.addEventListener("click", () => {
     setColor2(randomColorGenerator())
     updateBody()
     // color2.style.background = getColor2()
-    setElemBackground(color2, getColor2())
+    setElemBackground(color2, getColor2() || "#000")
     updateText()
     setElemBackground(copyButton, getUpdatedColor())
     setElemBackground(generate, getUpdatedColor())
     setTextBrightness()
 })
 
-const setElemBackground = (/** @type {Element} */ elem, /** @type {string} */ color) => {
+const setElemBackground = (
+  /** @type {Element} */ elem,
+  /** @type {string} */ color
+) => {
+    if (!(elem instanceof HTMLElement)) return
     elem.style.background = color
 }
 
-generate?.addEventListener('click', () => generateNewCombo(randomColorGenerator));
+generate?.addEventListener("click", () =>
+    generateNewCombo(randomColorGenerator)
+);
 // IIFE to generate a new color combo on page load
-(function (randomColor) { generateNewCombo(randomColor) })(randomColorGenerator)
-
-
-
+(function () {
+    generateNewCombo(randomColorGenerator)
+})()
 
 // ChatGPT Code
 // const elements = {
@@ -229,8 +240,6 @@ generate?.addEventListener('click', () => generateNewCombo(randomColorGenerator)
 
 // // IIFE to generate a new color combo on page load
 // (() => generateNewCombo(randomColorGenerator))();
-
-
 
 //Deepseek Code
 
